@@ -1,6 +1,6 @@
-import './App.css';
 import CodeInput from './components/CodeInput';
 import CompileButton from './components/CompileButton';
+import * as Comlink from "comlink";
 
 function App() {
   return (
