@@ -1,7 +1,15 @@
-function CompileButton(){
+import {emscripten} from '@gabrieleroncolato/emception-core';
+
+function CompileButton(){ 
+
+    emscripten();
+
+    const compile = () => {
+        console.log('[onClick compile] Hello world!');
+    };
 
     return(
-        <button>
+        <button onClick={compile}>
             Compile your code
         </button>
     );
