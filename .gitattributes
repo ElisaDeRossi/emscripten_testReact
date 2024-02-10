@@ -1,0 +1,2 @@
+emscriptem-test/public/static_lib/root_pack/** filter=lfs diff=lfs merge=lfs -text
+emscriptem-test/public/static_lib/lazy_cache/** filter=lfs diff=lfs merge=lfs -text
