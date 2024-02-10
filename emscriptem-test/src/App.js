@@ -1,11 +1,9 @@
-import CodeInput from './components/CodeInput';
-import CompileButton from './components/CompileButton';
+import WriteAndCompile from "./components/WriteAndCompile";
 
 function App() {
   return (
     <div className="App">
-     <CodeInput/>
-     <CompileButton/>
+     <WriteAndCompile/>
     </div>
   );
 }
