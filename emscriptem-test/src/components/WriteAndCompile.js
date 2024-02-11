@@ -123,7 +123,7 @@ function WriteAndCompile() {
         width : "600px"
     };
 
-    const [codeString, setCodeString] = useState(defaultPrograms[1]);
+    const [codeString, setCodeString] = useState(defaultPrograms[0]);
     const [srcURL, setsrcURL] = useState("");
 
     let url="";    
@@ -165,7 +165,6 @@ function WriteAndCompile() {
             </div>
         </div>
     );
-
 }
 
 export default WriteAndCompile;
