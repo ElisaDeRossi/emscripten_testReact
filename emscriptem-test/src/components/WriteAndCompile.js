@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Emception from "@gabrieleroncolato/emception-core/src/index.js"
+import Emception from "@gabrieleroncolato/emception-core"
 
 export const spinner = (size) => `
     <div style="font-size: calc(${size}px / 13)">
