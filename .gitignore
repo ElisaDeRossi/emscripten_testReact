@@ -1,2 +1,4 @@
-node_modules
+node_modules/
 package-lock.json
+
+public/static_lib/root_pack/root.pack
