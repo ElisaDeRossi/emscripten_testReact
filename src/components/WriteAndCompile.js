@@ -2,12 +2,12 @@ import React, { useState } from "react";
 import Emscriptenjs from "@emscriptenjs/emscriptenjs"
 
 const defaultPrograms = [
-`#include <iostream>
+    `#include <iostream>
 int main(){
     std::cout << "Hello world" << std::endl;
     return 0;
 }`,
-`#include <iostream>
+    `#include <iostream>
 #include <string>
 
 int main(){
@@ -17,7 +17,7 @@ int main(){
     std::cout << name << std::endl;
     return 0;
 }`,
-`#include <iostream>
+    `#include <iostream>
 
 double calculateArea(double length, double width) {
     return length * width;
@@ -55,12 +55,22 @@ function WriteAndCompile() {
         fontFamily: "'Courier New', Courier, monospace",
         display: 'flex',
         height: '500px',
-        padding: '20px', 
+        padding: '20px',
     };
 
-    const divStyle={
+    const divStyle = {
         display: "flex",
-        gap    : "10px 20px",
+        gap: "10px 20px",
+    };
+
+    const columnStyle = {
+        flexDirection: 'column',
+    };
+
+    const headerStyle = {
+        fontSize: '24px',
+        fontFamily: 'Arial, sans-serif',
+        textAlign: 'center',
     };
 
     const outputStyle = {
@@ -73,20 +83,20 @@ function WriteAndCompile() {
         display: 'flex',
         height: '500px',
         padding: '20px',
-        flexDirection: 'column' 
+        flexDirection: 'column'
     };
 
     const paragraphStyle = {
         margin: '5px'
     };
 
-    const [codeString, setCodeString] = useState(defaultPrograms[1]);
+    const [codeString, setCodeString] = useState(defaultPrograms[2]);
     let [output, setOutput] = useState([]);
 
     const compile = async () => {
 
         let initialOutput = [];
-        
+
         // Override prompt function
         /* TODO: doesn't work for some reason
         const originalPrompt = window.prompt;
@@ -100,7 +110,7 @@ function WriteAndCompile() {
         // Override console.log function
         const originalLog = console.log;
         console.log = (message) => {
-            initialOutput.push(message); 
+            initialOutput.push(message);
             setOutput([...initialOutput]);
         };
 
@@ -108,11 +118,11 @@ function WriteAndCompile() {
         const emscriptenjs = new Emscriptenjs();
         await emscriptenjs.init();
         await emscriptenjs.fileSystem.writeFile("/working/main.cpp", codeString);
-        
+
         console.log("> Compiling code");
         const cmd = "em++ -O2 -fexceptions -sEXIT_RUNTIME=1 -sSINGLE_FILE=1 -sMINIFY_HTML=0 -sUSE_CLOSURE_COMPILER=0 main.cpp -o main.js";
         const result = await emscriptenjs.run(cmd);
-        
+
         if (result.returncode === 0) {
             console.log("> Compilation was successful");
             console.log("> OUTPUT: ");
@@ -123,7 +133,7 @@ function WriteAndCompile() {
 
             funct();
         } else {
-            alert("Compilation failed");
+            console.log("> Compilation failed");
         }
 
         // Reassign functions
@@ -133,7 +143,8 @@ function WriteAndCompile() {
 
     return (
         <div style={divStyle}>
-            <div style={divStyle}>
+            <div style={columnStyle}>
+                <p style={headerStyle}>YOUR CODE:</p>
                 <textarea style={textAreaStyle} value={codeString} onChange={e => setCodeString(e.target.value)}>
                     {codeString}
                 </textarea>
@@ -143,10 +154,13 @@ function WriteAndCompile() {
                     Compile your code
                 </button>
             </div>
-            <div style={outputStyle}>
-                {output.map((text, index) => (
-                    <p key={index} style={paragraphStyle}>{text}</p>
-                ))}
+            <div style={columnStyle}>
+                <p style={headerStyle}>TERMINAL:</p>
+                <div style={outputStyle}>
+                    {output.map((text, index) => (
+                        <p key={index} style={paragraphStyle}>{text}</p>
+                    ))}
+                </div>
             </div>
         </div>
     );
