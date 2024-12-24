@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import Emscriptenjs from "@emscriptenjs/emscriptenjs"
 
 const defaultPrograms = [
-    `#include <iostream>
+`#include <iostream>
 int main(){
     std::cout << "Hello world" << std::endl;
     return 0;
 }`,
-    `#include <iostream>
+
+`#include <iostream>
 #include <string>
 
 int main(){
@@ -17,7 +18,8 @@ int main(){
     std::cout << name << std::endl;
     return 0;
 }`,
-    `#include <iostream>
+
+`#include <iostream>
 
 double calculateArea(double length, double width) {
     return length * width;
@@ -39,6 +41,23 @@ int main() {
     std::cout << "Area: " << area << std::endl;
     std::cout << "Perimeter: " << perimeter << std::endl;
 
+    return 0;
+}`,
+
+`#include <iostream>
+int main(){
+    std::string a;
+    std::cin >> a;
+    std::cout << a << std::endl;
+    return 0;
+}`, 
+
+`#include <iostream>
+#include <emscripten.h>
+
+int main() {
+    std::string input = emscripten_run_script_string("prompt('Please enter your name:');");
+    std::cout << input << std::endl;
     return 0;
 }`
 ]
@@ -90,10 +109,10 @@ function WriteAndCompile() {
         margin: '5px'
     };
 
-    const [codeString, setCodeString] = useState(defaultPrograms[2]);
+    const [codeString, setCodeString] = useState(defaultPrograms[4]);
     let [output, setOutput] = useState([]);
 
-    const compile = async () => {
+    const compileAndRun = async () => {
 
         let initialOutput = [];
 
@@ -133,7 +152,8 @@ function WriteAndCompile() {
 
             funct();
         } else {
-            console.log("> Compilation failed");
+            console.log("> Compilation failed - code " + result.returncode);
+            console.log("See console for more information");
         }
 
         // Reassign functions
@@ -150,7 +170,7 @@ function WriteAndCompile() {
                 </textarea>
             </div>
             <div style={divStyle}>
-                <button onClick={compile}>
+                <button onClick={compileAndRun}>
                     Compile your code
                 </button>
             </div>
