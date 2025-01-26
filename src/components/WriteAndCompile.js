@@ -60,11 +60,16 @@ int main() {
     std::cout << input << std::endl;
     return 0;
 }`
-]
+]; 
 
 function WriteAndCompile() {
 
     /* STYLE */
+    const divStyle = {
+        display: "flex",
+        gap: "10px 20px",
+    };
+    
     const textAreaStyle = {
         backgroundColor: '#2d2d2d',
         border: '1px solid #444',
@@ -77,7 +82,7 @@ function WriteAndCompile() {
         padding: '20px',
     };
 
-    const divStyle = {
+    const compileButtonStyle = {
         display: "flex",
         gap: "10px 20px",
     };
@@ -102,63 +107,82 @@ function WriteAndCompile() {
         display: 'flex',
         height: '500px',
         padding: '20px',
-        flexDirection: 'column'
+        flexDirection: 'column',
+        overflowY: 'auto'
     };
 
     const paragraphStyle = {
         margin: '5px'
     };
 
-    const [codeString, setCodeString] = useState(defaultPrograms[4]);
+    const [codeString, setCodeString] = useState(defaultPrograms[1]);
     let [output, setOutput] = useState([]);
 
     const compileAndRun = async () => {
 
         let initialOutput = [];
 
-        // Override prompt function
-        /* TODO: doesn't work for some reason
-        const originalPrompt = window.prompt;
-        window.prompt = (message, def) => {
-            initialOutput.push("> " + message + ": ");
-            setOutput([...initialOutput]);
-            // originalPrompt(message, def);
-        };
-        */
-
-        // Override console.log function
-        const originalLog = console.log;
-        console.log = (message) => {
+        const outputInfo = (message) => {
+            
+            // Terminal
             initialOutput.push(message);
             setOutput([...initialOutput]);
+
+            // Console
+            console.log(message);
         };
 
-        console.log("> Initiating emscriptenjs");
+        outputInfo("> Initiating emscriptenjs");
+        
         const emscriptenjs = new Emscriptenjs();
         await emscriptenjs.init();
         await emscriptenjs.fileSystem.writeFile("/working/main.cpp", codeString);
 
-        console.log("> Compiling code");
+        // Listen for compilation stdout events
+        emscriptenjs.on('compilationStdout', (data) => {
+            outputInfo(data);
+        });
+
+        // Listen for compilation stderr events
+        emscriptenjs.on('compilationStderr', (data) => {
+            outputInfo(data);
+        });
+
+        // Listen for execution stdout events
+        emscriptenjs.on('executionStdout', (data) => {
+            outputInfo(data);
+        });
+
+        // Listen for execution stderr events
+        emscriptenjs.on('executionStderr', (data) => {
+            outputInfo(data);
+        });
+
+        // Listen for execution stdin events
+        // TODO: doesn't work somehow - need to fix
+        emscriptenjs.on('executionStdin', (data, def) => {
+            /*
+            initialOutput.push("> " + message + ": ");
+            setOutput([...initialOutput]);
+            // originalPrompt(message, def);
+            */
+            window.prompt('Execution Standard Input:' + data, def);
+        });
+
+        outputInfo("> Compiling code");
+
         const cmd = "em++ -O2 -fexceptions -sEXIT_RUNTIME=1 -sSINGLE_FILE=1 -sMINIFY_HTML=0 -sUSE_CLOSURE_COMPILER=0 main.cpp -o main.js";
-        const result = await emscriptenjs.run(cmd);
+        const result = await emscriptenjs.compile(cmd);
 
         if (result.returncode === 0) {
-            console.log("> Compilation was successful");
-            console.log("> OUTPUT: ");
-
-            const content = await emscriptenjs.fileSystem.readFile("/working/main.js", { encoding: "utf8" });
-            // eslint-disable-next-line
-            const funct = new Function(content);
-
-            funct();
+            outputInfo("> Compilation was successful");
+            outputInfo("> OUTPUT: ");
+            
+            emscriptenjs.execute();
         } else {
-            console.log("> Compilation failed - code " + result.returncode);
-            console.log("See console for more information");
+            outputInfo("> Compilation failed - code " + result.returncode);
+            outputInfo("See console for more information");
         }
-
-        // Reassign functions
-        console.log = originalLog;
-        // window.prompt = originalPrompt;
     };
 
     return (
@@ -169,7 +193,7 @@ function WriteAndCompile() {
                     {codeString}
                 </textarea>
             </div>
-            <div style={divStyle}>
+            <div style={compileButtonStyle}>
                 <button onClick={compileAndRun}>
                     Compile your code
                 </button>
